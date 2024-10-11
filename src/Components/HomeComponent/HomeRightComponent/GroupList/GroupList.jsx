@@ -131,9 +131,9 @@ const GroupList = () => {
 
           {/* Cropper Body */}
         <div>
-          <div style={{ width: "100%" }}>
+          <div className='my-10'>
             <input type="file" onChange={onChange} />
-            <button className='-mx-7'>Use default img</button>
+            <button className=''>Use default img</button>
             
           </div>
           <div className="flex w-[1200px] justify-between">
@@ -157,7 +157,7 @@ const GroupList = () => {
           </div>
             {/* Preview */}
             <div className=" bg-red-500 h-[250px] w-[350px] relative">
-              <h1 className='absolute -top-7 left-5'>Preview</h1>
+              <h1 className='absolute -top-7 '>Preview</h1>
               <div className="img-preview overflow-hidden h-[250px] z-10 preview_box"/>
             </div>
            {/* Preview */}
