@@ -90,12 +90,6 @@ const onGroupchangehandler = (event) => {
 };
 
 
-
-
-
-
-
-
 /**
  * todo: handleGroup function implement
  */
@@ -103,14 +97,13 @@ const onGroupchangehandler = (event) => {
 const handleGroup = ()=>{
   const {grouptagName , groupName} = groupInputValue;
   if(!cropData || !grouptagName || !groupName){
-    return ErrorToast(`Must Fillup the grouptagName or the groupName or Cropping Image`, "top-center" , 7000);
+    return ErrorToast(`Must Fillup the grouptagName or the groupName or Cropping Image`, "top-center");
   }
   setloading(true)
-  // console.log(groupInputValue.cropimage);
   const storageRef = ref(storage, `GroupImage/image${uuidv4() }`);
   uploadString(storageRef,cropData , 'data_url')
   .then((snapshot) => {
-    // console.log('Uploaded a data_url string!', snapshot);
+    
     setCropData("");
      
   }).then(()=>{
@@ -146,8 +139,6 @@ const handleGroup = ()=>{
   })
 }
 
-
-  
 
   return (
     <>
@@ -212,14 +203,17 @@ const handleGroup = ()=>{
             onChange={onGroupchangehandler}
           />
 
-          <label htmlFor="GrouptagName">{" "}GrouptagName <span className='text-red-500'>*</span></label>
-          <input type='text'
-           className='w-full bg-gray-300 border-2 border-red-200 py-2 px-2 rounded-md'
-           id='GrouptagName' 
-           name='GrouptagName' 
-           value={groupInputValue.GrouptagName}
-           onChange={onGroupchangehandler}
-          />
+              <label htmlFor="grouptagName">
+                grouptagName <span className="text-red-500">*</span>
+              </label>
+              <input
+                className="w-full rounded-xl border-2 border-red-100 bg-gray-200 px-2 py-2"
+                type="text"
+                id="grouptagName"
+                name="grouptagName"
+                value={groupInputValue.grouptagName}
+                onChange={onGroupchangehandler}
+              />
 
           {/* Cropper Body */}
         <div>
