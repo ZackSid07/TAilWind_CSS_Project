@@ -6,7 +6,7 @@ import GroupList from '../../Components/HomeComponent/HomeRightComponent/GroupLi
 import Friends from '../../Components/HomeComponent/HomeRightComponent/Friends/Friends.jsx'
 import UserList from '../../Components/HomeComponent/HomeRightComponent/UserList/UserList.jsx'
 import FriendRquest from '../../Components/HomeComponent/HomeRightComponent/FriendRquest/FriendRquest.jsx'
-import Group from '../../Components/HomeComponent/HomeRightComponent/Group/Group.jsx'
+import Group from '../../Components/HomeComponent/HomeRightComponent/MyGroup/Group.jsx'
 import BlokUser from '../../Components/HomeComponent/HomeRightComponent/BlokUser/BlokUser.jsx'
 
 const Home = () => {
