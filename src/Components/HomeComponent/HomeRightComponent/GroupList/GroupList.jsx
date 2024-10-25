@@ -1,4 +1,4 @@
-import React, { useState, useRef  } from 'react'
+import React, { useState, useRef, useEffect  } from 'react'
 import Search from '../Search/Search.jsx'
 import { FcSearch } from 'react-icons/fc'
 import { BsThreeDotsVertical } from 'react-icons/bs'
@@ -10,7 +10,7 @@ import { ErrorToast, SuccessToast } from '../../../../../Utils/ToastMessage/Toas
 import { getStorage, ref, uploadString, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from 'uuid';
 import { data } from 'autoprefixer'
-import { getDatabase, ref as dbref, set, push } from "firebase/database";
+import { getDatabase, ref as dbref, set, push, onValue } from "firebase/database";
 import { getAuth } from 'firebase/auth' 
 import moment from 'moment';
 
@@ -32,11 +32,51 @@ const customStyles = {
 const GroupList = () => {
 
   const [modalIsOpen, setIsOpen] = useState(false);
+  const [allgroupList , setallgroupList] = useState([]);
+  const [allgroupRequestList , setallgroupRequestList] = useState([]);
   const [groupInputValue , setgroupInputValue] = useState({
     groupName:"",
-    GrouptagName:"",
-  
+    GrouptagName:"", 
   })
+
+
+  //fetch group info
+  useEffect(()=>{
+    const starCountRef = dbref(db, 'groups/'); 
+    onValue(starCountRef, (snapshot) => {
+    const groupbalnkarr = []
+    snapshot.forEach((item)=>{
+      if(item.val().whoCreatedGroupuid !== auth.currentUser.uid ){
+        groupbalnkarr.push({...item.val() , groupKey: item.key});
+      }
+      
+    })
+    setallgroupList(groupbalnkarr);
+    });
+  },[])
+
+  // console.log(allgroupList);
+
+
+
+    //fetch groupRequest info
+  useEffect(() => {
+    const starCountRef = dbref(db, "groupRequest/");
+    onValue(starCountRef, (snapshot) => {
+      const groupRequestblankarr = [];
+      snapshot.forEach((item) => {
+        groupRequestblankarr.push(
+          item.val().groupKey + item.val().whoJoinGroupUid,
+        );
+      });
+      setallgroupRequestList(groupRequestblankarr);
+    });
+  }, []);
+
+    // console.log(allgroupRequestList);
+    
+
+  
   const [loading , setloading] = useState(false)
   const storage = getStorage();
   const db = getDatabase();
@@ -110,7 +150,7 @@ const handleGroup = ()=>{
     return getDownloadURL(storageRef);
   }).then((groupDownloadUrl)=>{
     set(push(dbref(db, 'groups/')), {
-      whoCreatedGroup: auth.currentUser.uid,
+      whoCreatedGroupuid: auth.currentUser.uid,
       whoCreatedGroupName: auth.currentUser.displayName,
       whoCreatedGroupProfile_picture: auth.currentUser.photoURL,
       whoCreatedGroupEmail: auth.currentUser.email,
@@ -139,6 +179,25 @@ const handleGroup = ()=>{
   })
 }
 
+/**
+ * todo:handlejoinGroup function implementation
+ * @param(item) 
+ */
+
+const handlejoinGroup = (item = {})=>{
+  set(push(dbref(db, 'groupRequest/')), 
+  {...item, whoJoinGroupUid : auth.currentUser.uid ,
+    whoJoinGroupName : auth.currentUser.displayName,
+    whoJoinGroupEmail : auth.currentUser.email,
+    whoJoinGroupProfile_picture : auth.currentUser.photoURL,
+    createdAt : moment().format("MM DD YYYY, h:mm:ss a"),
+
+   
+  });
+
+  
+}
+
 
   return (
     <>
@@ -156,29 +215,41 @@ const handleGroup = ()=>{
     </div>
    <div className=' h-[356px] w-[527px] rounded-2xl shadow-2xl'>
     <div className='flex justify-between items-center px-5 py-1'>
-      <h1 className='text-black text-xl font-semibold font-popping'>Group List</h1>
+      <h1 className='text-black text-xl font-semibold font-popping relative'>
+      Group List
+        <span class="absolute -top-3 -right-10 flex h-10 w-10">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full  h-10 w-10 bg-sky-200 flex justify-center items-center">{allgroupList?.length}</span>
+        </span>
+        </h1>
       <span className='text-Auth_maun_color text-lg cursor-pointer'>
       <button className='button rounded-[9px] px-3 py-2 ml-4 flex items-center'onClick={openModal}>Create Group</button>
       </span>
     </div>
-    <div className=' h-[84%] w-full px-5  overflow-y-scroll rounded-2xl divide-y-2 scrollbar-thin scrollbar-thumb-sky-300 scrollbar-track-gray-300'>
-      {[...new Array(10)].map((_,index)=>(
-         <div className='flex mt-6 gap-x-3 items-center'>
-         <div className='h-[60px] w-[60px] rounded-full shadow-2xl '>
+    <div className={allgroupList?.length > 0 ? ' h-[84%] w-full px-5  overflow-y-scroll rounded-2xl divide-y-2 scrollbar-thin scrollbar-thumb-sky-300 scrollbar-track-gray-300' : "flex items-center justify-center h-full"}>
+      {allgroupList?.length > 0 ? (allgroupList?.map((item)=>(
+         <div className='flex mt-6 gap-x-3 items-center' key={item.groupKey}>
+         <div className='h-[80px] w-[80px] rounded-full shadow-2xl'>
              <picture>
-               <img src={avater} alt={avater} />
+               <img src={item?item.groupName :  avater} alt={item?item.groupName :  avater} className=' h-[50px]' />
              </picture>
            </div>
-           <div className='basis-[70%]  flex flex-col justify-center items-start ml-3'>
-             <h2 className='heading'>Friends Reunion</h2>
-             <p className='subHeading'>Hi Guys, Wassup!</p>
+           <div className='basis-[75%]  flex flex-col justify-center items-start ml-3'>
+             <h2 className='heading'>{item? item.groupName : "Friends Reunion"}</h2>
+             <p className='subHeading'>{item? item.GroupTagName : "Hi Guys, Wassup!"}</p>
            </div>
            <div>
-             <button className='button rounded-[9px] px-4 py-2 ml-4 flex items-center'>Join</button>
+            {allgroupRequestList?.includes(item.groupKey + auth.currentUser.uid)?(<span className='text-Auth_maun_color text-lg cursor-pointer'>
+                <button className='button rounded-[9px] px-5 py-2 ml-4 flex items-center' >Request Pending</button>
+            </span>) : (<span className='text-Auth_maun_color text-lg cursor-pointer'>
+                <button className='button rounded-[9px] px-5 py-2 ml-4 flex items-center' onClick={()=>handlejoinGroup(item)}>Join</button>
+            </span>)}
+           
            </div>
          </div>
-      ))}
-    
+      ))) : (<div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50  dark:text-red-400" role="alert">
+        <span class="font-medium">Danger alert!</span> No Group Creat a New Group
+      </div>)}
     
     </div>
   

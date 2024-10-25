@@ -48,7 +48,7 @@ const UserList = () => {
     });
   },[])
 
-  console.log(FriendRequestList);
+  // console.log(FriendRequestList);
   
 
   // console.log(userList);
@@ -86,7 +86,7 @@ const UserList = () => {
       User List
         <span class="absolute -top-3 -right-10 flex h-10 w-10">
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full  h-10 w-10 bg-sky-200 flex justify-center items-center">{userList?.length}</span>
+          <span class="relative rounded-full  h-10 w-10 bg-sky-200 flex justify-center items-center">{userList?.length}</span>
         </span>
         </h1>
       <span className='text-Auth_maun_color text-2xl cursor-pointer'>
@@ -107,13 +107,21 @@ const UserList = () => {
            </div>
            <div>
            {
-            FriendRequestList.includes(auth.currentUser.uid + item.userUid || item.userUid + auth.currentUser.uid)?
-            (<button className='button rounded-[9px] px-6 py-2 ml-4 flex items-center' >
-            -
-           </button>) : 
-           (<button className='button rounded-[9px] px-6 py-2 ml-4 flex items-center' onClick={()=>handleFriendRequest(item)}>
-            +
-           </button>)}
+            FriendRequestList.includes(
+              auth.currentUser.uid + item.userUid ||
+                item.userUid + auth.currentUser.uid,
+            )?
+            (
+              <button className="button ml-4 rounded-lg px-7 py-2">
+                -
+              </button>
+            )  : (
+            <button
+                    className="button ml-4 rounded-lg px-7 py-2"
+                    onClick={() => handleFriendRequest(item)}
+                  >
+                    +
+                  </button>)}
            
            </div>
          </div>
